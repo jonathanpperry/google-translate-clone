@@ -1,4 +1,5 @@
 import TranslationForm from "@/components/TranslationForm";
+import TranslationHistory from "@/components/TranslationHistory";
 import { auth } from "@clerk/nextjs/server";
 
 export type TranslationLanguages = {
@@ -33,7 +34,7 @@ const TranslatePage = async () => {
     <div className="px-10 xl:px-0 mb-20">
       <TranslationForm languages={languages} />
 
-      {/* Translation history */}
+      <TranslationHistory />
     </div>
   );
 };

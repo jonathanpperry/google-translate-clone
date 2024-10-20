@@ -1,8 +1,10 @@
 "use server";
 
 import { State } from "@/components/TranslationForm";
+import { addOrUpdateUser } from "@/mongodb/models/User";
 import { auth } from "@clerk/nextjs/server";
 import axios from "axios";
+import { revalidateTag } from "next/cache";
 import { v4 } from "uuid";
 
 const key = process.env.AZURE_TEXT_TRANSLATION_KEY;
@@ -54,7 +56,24 @@ async function translate(prevState: State, formData: FormData) {
     console.log(`Error ${data.error.code}: ${data.error.message}`);
   }
 
-  // Push to MongoDB here...
+  if (rawFormData.inputLanguage == "auto") {
+    rawFormData.inputLanguage = data[0].detectedLanguage.language;
+  }
+
+  try {
+    const translation = {
+      to: rawFormData.outputLanguage,
+      from: rawFormData.inputLanguage,
+      fromText: rawFormData.input,
+      toText: data[0].translations[0].text,
+    };
+
+    addOrUpdateUser(userId, translation);
+  } catch (error) {
+    console.error("Error adding translation to user: ", error);
+  }
+
+  revalidateTag("translationHistory");
 
   return {
     ...prevState,
