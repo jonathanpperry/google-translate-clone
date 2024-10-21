@@ -115,8 +115,6 @@ export async function removeTranslation(
       throw new Error("User not found.");
     }
 
-    console.log("Translation removed: ", user);
-
     return user;
   } catch (err) {
     console.error("Error removing translation: ", err);
